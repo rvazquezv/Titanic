@@ -92,3 +92,68 @@ confusionMatrix(factor(y_hat_SP), test_set$Survived)
 F_meas(factor(y_hat_S), test_set$Survived)
 F_meas(factor(y_hat_P), test_set$Survived)
 F_meas(factor(y_hat_SP), test_set$Survived)
+
+
+
+###Question 7
+
+set.seed(1, sample.kind = "Rounding") 
+train_lda <- train(Survived ~ Fare , method = "lda", data = train_set)
+lda_prediction <- predict(train_lda, test_set)
+confusionMatrix(lda_prediction, test_set$Survived)$overall["Accuracy"]
+
+
+
+set.seed(1, sample.kind = "Rounding") 
+
+
+train_qda <- train(Survived ~ Fare , method = "qda", data = train_set)
+qda_prediction <- predict(train_qda, test_set)
+confusionMatrix(qda_prediction, test_set$Survived)$overall["Accuracy"]
+
+
+###Question 8
+
+set.seed(1, sample.kind = "Rounding") 
+
+train_glm <- train(Survived ~ Age , method = "glm", data = train_set)
+
+y_hat_glm <- predict(train_glm, test_set)
+confusionMatrix(y_hat_glm, test_set$Survived)$overall["Accuracy"]
+
+
+set.seed(1, sample.kind = "Rounding") 
+
+train_glm2 <- train(Survived ~ Sex+Pclass+Fare+Age , method = "glm", data = train_set)
+
+y_hat_glm2<- predict(train_glm2, test_set)
+confusionMatrix(y_hat_glm2, test_set$Survived)$overall["Accuracy"]
+
+
+set.seed(1, sample.kind = "Rounding") 
+
+train_glm3 <- train(Survived ~ . , method = "glm", data = train_set)
+
+y_hat_glm3<- predict(train_glm3, test_set)
+confusionMatrix(y_hat_glm2, test_set$Survived)$overall["Accuracy"]
+
+
+###Question 9, to be able to run R:  https://rdrr.io/snippets/
+
+set.seed(6, sample.kind = "Rounding") 
+
+train_knn <- train(Survived ~ . , method = "knn", data = train_set, tuneGrid = data.frame(k = seq(3, 51, 2)))
+
+train_knn$bestTune
+
+plot(train_knn)
+plot(train_knn$results$k,train_knn$results$Accuracy)
+
+y_hat_knn<- predict(train_knn, test_set)
+confusionMatrix(y_hat_knn, test_set$Survived)$overall["Accuracy"]
+
+
+
+###Question 10
+
+
