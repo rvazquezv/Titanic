@@ -14,7 +14,7 @@ titanic_clean <- titanic_train %>%
          FamilySize = SibSp + Parch + 1) %>%    # count family members
   select(Survived,  Sex, Pclass, Age, Fare, SibSp, Parch, FamilySize, Embarked)
 
-###Question 1
+###Question 1  PArtitioning Data
 
 set.seed(42, sample.kind = "Rounding") # if using R 3.6 or later
 y<-titanic_clean$Survived
@@ -78,7 +78,7 @@ mean(y_hat_SP==test_set$Survived)
 
 
 
-###Question 5
+###Question 5  Confusion Matrix
 
 confusionMatrix(factor(y_hat_S), test_set$Survived)
 
@@ -87,15 +87,14 @@ confusionMatrix(factor(y_hat_P), test_set$Survived)
 confusionMatrix(factor(y_hat_SP), test_set$Survived)
 
 
-###Question 6
+###Question 6  F1 Scores
 
 F_meas(factor(y_hat_S), test_set$Survived)
 F_meas(factor(y_hat_P), test_set$Survived)
 F_meas(factor(y_hat_SP), test_set$Survived)
 
 
-
-###Question 7
+###Question 7  LDA 6 DQA models
 
 set.seed(1, sample.kind = "Rounding") 
 train_lda <- train(Survived ~ Fare , method = "lda", data = train_set)
@@ -112,7 +111,7 @@ qda_prediction <- predict(train_qda, test_set)
 confusionMatrix(qda_prediction, test_set$Survived)$overall["Accuracy"]
 
 
-###Question 8
+###Question 8  GLM model
 
 set.seed(1, sample.kind = "Rounding") 
 
@@ -138,7 +137,7 @@ y_hat_glm3<- predict(train_glm3, test_set)
 confusionMatrix(y_hat_glm2, test_set$Survived)$overall["Accuracy"]
 
 
-###Question 9, to be able to run R:  https://rdrr.io/snippets/
+###Question 9, KNN model to be able to run R:  https://rdrr.io/snippets/
 
 set.seed(6, sample.kind = "Rounding") 
 
@@ -154,6 +153,50 @@ confusionMatrix(y_hat_knn, test_set$Survived)$overall["Accuracy"]
 
 
 
-###Question 10
+###Question 10  CROSS VALIDATION
+
+set.seed(8, sample.kind = "Rounding") 
+train_control <- trainControl(method = "cv",number = 10,p=0.9)
+
+train_knncv <- train(Survived ~ . , method = "knn", data = train_set, tuneGrid = data.frame(k = seq(3, 51, 2)),trControl = train_control)
+
+train_knncv$bestTune
+
+y_hat_knncv<- predict(train_knncv, test_set)
+confusionMatrix(y_hat_knncv, test_set$Survived)$overall["Accuracy"]
 
 
+
+###Question 11  CART
+library(rpart)
+set.seed(10, sample.kind = "Rounding") 
+
+train_CART <- train(Survived ~ . , method = "rpart", data = train_set, tuneGrid = data.frame(cp = seq(0, 0.05, 0.002)))
+
+train_CART$bestTune
+
+plot(train_CART)
+
+y_hat_CART<- predict(train_CART, test_set)
+confusionMatrix(y_hat_CART, test_set$Survived)$overall["Accuracy"]
+
+plot(train_CART$finalModel, margin = 0.1)
+text(train_CART$finalModel)
+
+
+
+###Question 12  Random Forest
+
+library(randomForest)
+set.seed(14, sample.kind = "Rounding") 
+
+train_RF <- train(Survived ~ . , method = "rf", data = train_set,ntree=100, tuneGrid = data.frame(mtry = seq(1:7)))
+
+train_RF$bestTune
+
+y_hat_RF<- predict(train_RF, test_set)
+
+mean(y_hat_RF == test_set$Survived)
+confusionMatrix(y_hat_RF, test_set$Survived)$overall["Accuracy"]
+
+varImp(train_RF)
