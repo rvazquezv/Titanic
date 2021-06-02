@@ -1,2 +1,2 @@
 # Titanic
-Machien learning exam on Titanic dataset
+Machine learning exam on Titanic dataset
