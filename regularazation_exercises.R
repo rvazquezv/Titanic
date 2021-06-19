@@ -93,5 +93,30 @@ schools %>% top_n(10, new_score) %>% arrange(desc(new_score))
 
 
 
-####Q7
+####Q8
 
+
+
+
+alfas <- seq(10, 250)
+
+RMSE<-function(x,y){sqrt(sum((x-y)^2)/length(x))}
+
+rmses <- sapply(alfas, function(a){
+  predicted_schools <- schools %>% 
+    mutate(new_score = ((size*score)/(a+size)))
+  return(RMSE(predicted_schools$quality,predicted_schools$new_score))
+})
+qplot(alfas, rmses)  
+alfas[which.min(rmses)]
+
+
+
+
+alphas <- seq(10,250)
+rmse <- sapply(alphas, function(alpha){
+  score_reg <- sapply(scores, function(x) sum(x)/(length(x)+alpha))
+  sqrt(mean((score_reg - schools$quality)^2))
+})
+plot(alphas, rmse)
+alphas[which.min(rmse)]
